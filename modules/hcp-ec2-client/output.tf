@@ -5,3 +5,7 @@ output "host_id" {
 output "public_ip" {
   value = aws_instance.nomad_host[0].public_ip
 }
+
+output "private_ip" {
+  value = aws_instance.nomad_host[0].private_ip
+}

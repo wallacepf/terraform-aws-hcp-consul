@@ -108,7 +108,7 @@ module "nlb" {
       target_type      = "instance"
       targets = {
         frontend = {
-          target_id = aws_instance.nomad_host.id
+          target_id = aws_instance.nomad_host[0].id
           port      = 80
         }
       }
@@ -120,7 +120,7 @@ module "nlb" {
       target_type      = "instance"
       targets = {
         nomad = {
-          target_id = aws_instance.nomad_host.id
+          target_id = aws_instance.nomad_host[0].id
           port      = 8081
         }
       }

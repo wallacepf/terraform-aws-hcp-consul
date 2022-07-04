@@ -88,16 +88,12 @@ resource "random_id" "id" {
   prefix      = "consul-client"
   byte_length = 8
 }
-resource "random_id" "id_short" {
-  prefix      = "consul-qs"
-  byte_length = 4
-}
 
 module "nlb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "~> 6.0"
 
-  name = "${random_id.id_short.dec}-nomad-host-elb"
+  name = "nomad-host-elb"
 
   load_balancer_type = "network"
 

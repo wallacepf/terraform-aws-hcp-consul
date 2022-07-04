@@ -45,7 +45,7 @@ variable "vpc_cidr" {
   default     = "10.0.0.0/8"
 }
 
-variable "elb_public_subnet" {}
+variable "elb_public_subnets" {}
 variable "vpc_id" {
 
 }

@@ -88,12 +88,16 @@ resource "random_id" "id" {
   prefix      = "consul-client"
   byte_length = 8
 }
+resource "random_id" "id_short" {
+  prefix      = "consul-qs"
+  byte_length = 4
+}
 
 module "nlb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "~> 6.0"
 
-  name = "${random_id.id.dec}-hcp-nomad-host-elb"
+  name = "${random_id.id_short.dec}-nomad-host-elb"
 
   load_balancer_type = "network"
 
@@ -102,7 +106,7 @@ module "nlb" {
 
   target_groups = [
     {
-      name_prefix      = "frontend-"
+      name_prefix      = "fe-"
       backend_protocol = "TCP"
       backend_port     = 80
       target_type      = "instance"

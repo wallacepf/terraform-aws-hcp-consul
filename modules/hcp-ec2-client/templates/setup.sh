@@ -70,6 +70,6 @@ start_service "nomad"
 # nomad and consul service is type simple and might not be up and running just yet.
 sleep 10
 
-nomad run hashicups.nomad
+# nomad run hashicups.nomad
 
 echo "done"

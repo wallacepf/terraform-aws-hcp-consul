@@ -88,3 +88,55 @@ resource "random_id" "id" {
   prefix      = "consul-client"
   byte_length = 8
 }
+
+module "nlb" {
+  source  = "terraform-aws-modules/alb/aws"
+  version = "~> 6.0"
+
+  name = "${random_id.id.dec}-hcp-nomad-host-elb"
+
+  load_balancer_type = "network"
+
+  vpc_id  = var.vpc_id
+  subnets = var.elb_public_subnets
+
+  target_groups = [
+    {
+      name_prefix      = "frontend-"
+      backend_protocol = "TCP"
+      backend_port     = 80
+      target_type      = "instance"
+      targets = {
+        frontend = {
+          target_id = aws_instance.nomad_host.id
+          port      = 80
+        }
+      }
+    },
+    {
+      name_prefix      = "nomad-"
+      backend_protocol = "TCP"
+      backend_port     = 8081
+      target_type      = "instance"
+      targets = {
+        nomad = {
+          target_id = aws_instance.nomad_host.id
+          port      = 8081
+        }
+      }
+    },
+  ]
+
+  http_tcp_listeners = [
+    {
+      port               = 80
+      protocol           = "TCP"
+      target_group_index = 0
+    },
+    {
+      port               = 8081
+      protocol           = "TCP"
+      target_group_index = 1
+    }
+  ]
+}

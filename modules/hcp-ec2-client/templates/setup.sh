@@ -61,7 +61,7 @@ echo "${hashicups}" | base64 -d > hashicups.nomad
 setup_networking
 setup_deps
 
-# setup_nginx
+setup_nginx
 setup_consul
 
 start_service "consul"

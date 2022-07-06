@@ -36,17 +36,6 @@ resource "aws_security_group_rule" "allow_nomad_inbound" {
   security_group_id = var.security_group_id
 }
 
-resource "aws_security_group_rule" "allow_traefik_inbound" {
-  count       = length(var.allowed_http_cidr_blocks) >= 1 ? 1 : 0
-  type        = "ingress"
-  from_port   = 8082
-  to_port     = 8082
-  protocol    = "tcp"
-  cidr_blocks = var.allowed_http_cidr_blocks
-
-  security_group_id = var.security_group_id
-}
-
 resource "aws_security_group_rule" "allow_http_inbound" {
   count       = length(var.allowed_http_cidr_blocks) >= 1 ? 1 : 0
   type        = "ingress"
@@ -77,7 +66,7 @@ resource "aws_instance" "nomad_host" {
       })),
       nomad_service = base64encode(templatefile("${path.module}/templates/service", {
         service_name = "nomad",
-        service_cmd  = "/usr/bin/nomad agent -dev-connect -consul-token=${var.root_token} -bind 0.0.0.0",
+        service_cmd  = "/usr/bin/nomad agent -dev-connect -consul-token=${var.root_token}",
       })),
       hashicups  = base64encode(file("${path.module}/templates/hashicups.nomad")),
       nginx_conf = base64encode(file("${path.module}/templates/nginx.conf")),
@@ -127,24 +116,12 @@ module "nlb" {
     {
       name_prefix      = "nmd-"
       backend_protocol = "TCP"
-      backend_port     = 4646
+      backend_port     = 8081
       target_type      = "instance"
       targets = {
         nomad = {
           target_id = aws_instance.nomad_host[0].id
-          port      = 4646
-        }
-      }
-    },
-    {
-      name_prefix      = "lb-"
-      backend_protocol = "TCP"
-      backend_port     = 8082
-      target_type      = "instance"
-      targets = {
-        nomad = {
-          target_id = aws_instance.nomad_host[0].id
-          port      = 8082
+          port      = 8081
         }
       }
     },
@@ -161,10 +138,5 @@ module "nlb" {
       protocol           = "TCP"
       target_group_index = 1
     },
-        {
-      port               = 8082
-      protocol           = "TCP"
-      target_group_index = 2
-    }
   ]
 }

@@ -127,12 +127,12 @@ module "nlb" {
     {
       name_prefix      = "nmd-"
       backend_protocol = "TCP"
-      backend_port     = 8081
+      backend_port     = 4646
       target_type      = "instance"
       targets = {
         nomad = {
           target_id = aws_instance.nomad_host[0].id
-          port      = 8081
+          port      = 4646
         }
       }
     },

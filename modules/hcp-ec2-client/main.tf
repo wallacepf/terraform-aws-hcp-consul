@@ -36,7 +36,7 @@ resource "aws_security_group_rule" "allow_nomad_inbound" {
   security_group_id = var.security_group_id
 }
 
-resource "aws_security_group_rule" "allow_nomad_inbound" {
+resource "aws_security_group_rule" "allow_traefik_inbound" {
   count       = length(var.allowed_http_cidr_blocks) >= 1 ? 1 : 0
   type        = "ingress"
   from_port   = 8082

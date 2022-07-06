@@ -125,7 +125,7 @@ module "nlb" {
       }
     },
     {
-      name_prefix      = "nomad-"
+      name_prefix      = "nmd-"
       backend_protocol = "TCP"
       backend_port     = 8081
       target_type      = "instance"
@@ -137,7 +137,7 @@ module "nlb" {
       }
     },
     {
-      name_prefix      = "traefik-"
+      name_prefix      = "lb-"
       backend_protocol = "TCP"
       backend_port     = 8082
       target_type      = "instance"

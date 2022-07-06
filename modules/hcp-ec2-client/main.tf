@@ -36,6 +36,17 @@ resource "aws_security_group_rule" "allow_nomad_inbound" {
   security_group_id = var.security_group_id
 }
 
+resource "aws_security_group_rule" "allow_nomad_inbound" {
+  count       = length(var.allowed_http_cidr_blocks) >= 1 ? 1 : 0
+  type        = "ingress"
+  from_port   = 8082
+  to_port     = 8082
+  protocol    = "tcp"
+  cidr_blocks = var.allowed_http_cidr_blocks
+
+  security_group_id = var.security_group_id
+}
+
 resource "aws_security_group_rule" "allow_http_inbound" {
   count       = length(var.allowed_http_cidr_blocks) >= 1 ? 1 : 0
   type        = "ingress"
@@ -51,7 +62,7 @@ resource "aws_instance" "nomad_host" {
   count                       = 1
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t3.medium"
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = [var.security_group_id]
   user_data = templatefile("${path.module}/templates/user_data.sh", {
@@ -125,6 +136,18 @@ module "nlb" {
         }
       }
     },
+    {
+      name_prefix      = "traefik-"
+      backend_protocol = "TCP"
+      backend_port     = 8082
+      target_type      = "instance"
+      targets = {
+        nomad = {
+          target_id = aws_instance.nomad_host[0].id
+          port      = 8082
+        }
+      }
+    },
   ]
 
   http_tcp_listeners = [
@@ -137,6 +160,11 @@ module "nlb" {
       port               = 8081
       protocol           = "TCP"
       target_group_index = 1
+    },
+        {
+      port               = 8082
+      protocol           = "TCP"
+      target_group_index = 2
     }
   ]
 }

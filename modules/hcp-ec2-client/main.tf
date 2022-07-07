@@ -66,7 +66,7 @@ resource "aws_instance" "nomad_host" {
       })),
       nomad_service = base64encode(templatefile("${path.module}/templates/service", {
         service_name = "nomad",
-        service_cmd  = "/usr/bin/nomad agent -dev-connect -consul-token=${var.root_token}",
+        service_cmd  = "sudo /usr/bin/nomad agent -dev-connect -consul-token=${var.root_token}",
       })),
       hashicups  = base64encode(file("${path.module}/templates/hashicups.nomad")),
       nginx_conf = base64encode(file("${path.module}/templates/nginx.conf")),

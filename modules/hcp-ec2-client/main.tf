@@ -51,6 +51,7 @@ resource "aws_instance" "nomad_host" {
   count                       = 1
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t3.medium"
+  key_name                    = var.key_name
   associate_public_ip_address = false
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = [var.security_group_id]
@@ -125,6 +126,18 @@ module "nlb" {
         }
       }
     },
+    {
+      name_prefix      = "srv-"
+      backend_protocol = "TCP"
+      backend_port     = 22
+      target_type      = "instance"
+      targets = {
+        nomad = {
+          target_id = aws_instance.nomad_host[0].id
+          port      = 22
+        }
+      }
+    },
   ]
 
   http_tcp_listeners = [
@@ -137,6 +150,11 @@ module "nlb" {
       port               = 8081
       protocol           = "TCP"
       target_group_index = 1
+    },
+    {
+      port               = 22
+      protocol           = "TCP"
+      target_group_index = 3
     },
   ]
 }

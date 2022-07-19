@@ -154,7 +154,7 @@ module "nlb" {
     {
       port               = 22
       protocol           = "TCP"
-      target_group_index = 3
+      target_group_index = 2
     },
   ]
 }
